@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Card from "./components/Card";
 
 export default function SwitchCard() {
@@ -12,19 +12,21 @@ export default function SwitchCard() {
     const [gameStarted, setGameStarted] = useState(false);
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
+    const interval = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-        let interval = null;
         if (isActive) {
-            interval = setInterval(() => {
+            interval.current = setInterval(() => {
                 setSeconds(prevSeconds => prevSeconds + 1);
             }, 1000); // Update every second (1000ms)
         }
-        else if (!isActive) {
-            clearInterval(interval);
+        else if (interval.current !== null) {
+            clearInterval(interval.current);
         }
         return () => {
-            clearInterval(interval);
+            if (interval.current !== null) {
+                clearInterval(interval.current);
+            }
         }; // Cleanup on component unmount or isActive change
     }, [isActive]); // Re-run effect when isActive or seconds change
 
