@@ -26,7 +26,7 @@ export default function Card({
     return (
         <button
             onClick={onClick}
-            className={`border-2 rounded-md  ${selected ? "h-25 w-25" : "border-white h-30 w-30"}`}
+            className={`border-2 rounded-md  ${selected ? "h-[10vw] w-[10vw]" : "border-white h-[10vw] w-[10vw]"}`}
             style={{ backgroundColor: colors[id] }}
         />
     );

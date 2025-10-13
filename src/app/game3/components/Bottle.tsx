@@ -17,7 +17,7 @@ export default function Bottle({ id, selected, onClick }: Readonly<{ id: number;
     if (selected) {
         return (
             <div>
-                <button className="border-2 rounded-md h-25 w-30" style={{ backgroundColor: colors[id], opacity: 40 }} onClick={onClick} />
+                <button className="border-2 rounded-md h-25 w-30" style={{ backgroundColor: colors[id] }} onClick={onClick} />
             </div>
         );
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "./components/Card";
 
 export default function SwitchCard() {
@@ -10,6 +10,23 @@ export default function SwitchCard() {
     const [selectionFirst, setSelectionFirst] = useState<number | null>(null);
     const [count, setCount] = useState(0);
     const [gameStarted, setGameStarted] = useState(false);
+    const [seconds, setSeconds] = useState(0);
+    const [isActive, setIsActive] = useState(false);
+
+    useEffect(() => {
+        let interval = null;
+        if (isActive) {
+            interval = setInterval(() => {
+                setSeconds(prevSeconds => prevSeconds + 1);
+            }, 1000); // Update every second (1000ms)
+        }
+        else if (!isActive) {
+            clearInterval(interval);
+        }
+        return () => {
+            clearInterval(interval);
+        }; // Cleanup on component unmount or isActive change
+    }, [isActive]); // Re-run effect when isActive or seconds change
 
     function handleClick(i: number) {
         if (!gameStarted) {
@@ -49,6 +66,8 @@ export default function SwitchCard() {
         setCards(shuffleArray([...Array(10).keys()]));
         setTargetCards(shuffleArray([...Array(10).keys()]));
         setCount(0);
+        setSeconds(0);
+        setIsActive(true);
     }
 
     function getPairs() {
@@ -69,7 +88,7 @@ export default function SwitchCard() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-screen text-base md:text-lg lg:text-xl">
             <div className="*:block">
                 <button onClick={shuffleCard}>
                     {gameStarted ? "ReStart game" : "Start Game"}
@@ -81,16 +100,32 @@ export default function SwitchCard() {
                 }
             </div>
             <div>
-                <p>
-                    {gameStarted
-                        ? `You've done ${count.toString()} exchanges. There are ${getPairs().toString()} same pairs.`
-                        : ""}
-                </p>
                 {gameStarted
                     ? (getPairs() == 10
                             ? <p>Congratulations, YOU WIN!</p>
-                            : <p>Come on, you can do it!</p>)
-                    : ""}
+                            : (
+                                    <p>
+                                        Way to go! You did
+                                        {" "}
+                                        {count.toString()}
+                                        {" "}
+                                        exchanges. There are
+                                        {" "}
+                                        {getPairs().toString()}
+                                        {" "}
+                                        same pairs.
+                                    </p>
+                                ))
+                    : `Please click the start button to start the card switch game.`}
+            </div>
+            <div>
+                <p>
+                    {("0" + Math.floor(seconds / 3600).toString()).slice(-2)}
+                    :
+                    {("0" + Math.floor(seconds / 60).toString()).slice(-2)}
+                    :
+                    {("0" + (seconds % 60).toString()).slice(-2)}
+                </p>
             </div>
         </div>
     );

@@ -88,16 +88,16 @@ export default function SwitchBottle() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="flex">
-                <button className="border-2 rounded-lg h-25 w-50" onClick={gameStart}>Start Game</button>
+        <div className="flex-col items-center justify-center min-h-screen">
+            <div className="*:block">
+                <button onClick={gameStart}>Start Game</button>
             </div>
             <div className="flex">
                 { bottles.map((i, index) => <Bottle key={i} id={i} onClick={() => { handleClick(index); }} selected={index === first || index === second}></Bottle>)}
             </div>
             <div>
                 { showExchangeButton && (
-                    <button className="border-2 rounded-e-lg h-25 w-50" onClick={exchange}>Exchange card</button>)}
+                    <button onClick={exchange}>Exchange card</button>)}
             </div>
             <p>{getPairs()}</p>
         </div>
