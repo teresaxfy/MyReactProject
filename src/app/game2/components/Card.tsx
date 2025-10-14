@@ -21,7 +21,7 @@ export default function Card({
     onClick: () => void;
     selected: boolean;
 }>): JSX.Element {
-    const colors = [
+    /* const colors = [
         "oklch(70.4% 0.191 22.216)",
         "oklch(75% 0.183 55.934)",
         "oklch(90.5% 0.182 98.111)",
@@ -32,7 +32,7 @@ export default function Card({
         "oklch(58.5% 0.233 277.117)",
         "oklch(62.7% 0.265 303.9)",
         "oklch(74% 0.238 322.16)",
-    ];
+    ]; */
 
     const labubus = [
         labubu0,
