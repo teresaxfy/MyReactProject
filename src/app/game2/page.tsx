@@ -9,13 +9,12 @@ export default function SwitchCard() {
     const [targetCards, setTargetCards] = useState(orders);
     const [selectionFirst, setSelectionFirst] = useState<number | null>(null);
     const [count, setCount] = useState(0);
-    const [gameStarted, setGameStarted] = useState(false);
+    const [currentState, setCurrentState] = useState("preGame"); // "preGame", "inGame", "postGame"
     const [seconds, setSeconds] = useState(0);
-    const [isActive, setIsActive] = useState(false);
     const interval = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
-        if (isActive) {
+        if (currentState === "inGame") {
             interval.current = setInterval(() => {
                 setSeconds(prevSeconds => prevSeconds + 1);
             }, 1000); // Update every second (1000ms)
@@ -28,10 +27,10 @@ export default function SwitchCard() {
                 clearInterval(interval.current);
             }
         }; // Cleanup on component unmount or isActive change
-    }, [isActive]); // Re-run effect when isActive or seconds change
+    }, [currentState]); // Re-run effect when isActive or seconds change
 
     function handleClick(i: number) {
-        if (!gameStarted) {
+        if (currentState != "inGame") {
             return;
         }
 
@@ -64,12 +63,11 @@ export default function SwitchCard() {
     }
 
     function shuffleCard() {
-        setGameStarted(true);
         setCards(shuffleArray([...Array(10).keys()]));
         setTargetCards(shuffleArray([...Array(10).keys()]));
         setCount(0);
         setSeconds(0);
-        setIsActive(true);
+        setCurrentState("inGame");
     }
 
     function getPairs() {
@@ -77,6 +75,10 @@ export default function SwitchCard() {
         for (let i = 0; i < 10; i++) {
             if (cards[i] == targetCards[i])
                 pairs++;
+        }
+
+        if (pairs === 10) {
+            setCurrentState("postGame");
         }
 
         return pairs;
@@ -89,11 +91,36 @@ export default function SwitchCard() {
         setCount(count + 1);
     }
 
+    function generateComments() {
+        switch (currentState) {
+            case "preGame":
+                return (<p>Please click the start button to start the card switch game.</p>);
+            case "inGame":
+                return (
+                    <p>
+                        Way to go! You did
+                        {" "}
+                        {count.toString()}
+                        {" "}
+                        exchanges. There are
+                        {" "}
+                        {getPairs().toString()}
+                        {" "}
+                        same pairs.
+                    </p>
+                );
+            case "postGame":
+                return (<p>Congratulations, YOU WIN!</p>);
+            default:
+                return;
+        }
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-base md:text-lg lg:text-xl">
             <div className="*:block">
                 <button onClick={shuffleCard}>
-                    {gameStarted ? "ReStart game" : "Start Game"}
+                    {currentState === "preGame" ? "Start Game" : "ReStart game"}
                 </button>
             </div>
             <div className="flex">
@@ -102,23 +129,7 @@ export default function SwitchCard() {
                 }
             </div>
             <div>
-                {gameStarted
-                    ? (getPairs() == 10
-                            ? <p>Congratulations, YOU WIN!</p>
-                            : (
-                                    <p>
-                                        Way to go! You did
-                                        {" "}
-                                        {count.toString()}
-                                        {" "}
-                                        exchanges. There are
-                                        {" "}
-                                        {getPairs().toString()}
-                                        {" "}
-                                        same pairs.
-                                    </p>
-                                ))
-                    : `Please click the start button to start the card switch game.`}
+                {generateComments()}
             </div>
             <div>
                 <p>
