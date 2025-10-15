@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import "./Board2.css";
 
 const size = 8;
 
@@ -19,7 +18,7 @@ initialBoardState[3][4] = state.BLACK;
 initialBoardState[4][3] = state.BLACK;
 initialBoardState[4][4] = state.WHITE;
 
-export default function Board2() {
+export default function Board() {
     const [boardState, setBoardState] = useState(initialBoardState);
     const [currentPlayer, setCurrentPlayer] = useState<player>(state.WHITE);
 
@@ -98,20 +97,20 @@ export default function Board2() {
     }
 
     return (
-        <div className="board-container">
+        <div className="flex flex-col items-center gap-5">
             <h2>
                 {(winner === null)
                     ? (`Current Turn: ${currentPlayer === state.BLACK ? "Black" : "White"} (White: ${whiteCount.toString()} Black: ${blackCount.toString()})`)
                     : (`Winner: ${winner}`)}
             </h2>
-            <div className="board-grid">
+            <div className="grid grid-cols-8 grid-rows-8 w-96 h-96 border-2 border-neutral-800">
                 {boardState.map((s, r) => s.map((square, c) => (
                     <div
                         key={`${r.toString()} ${c.toString()}`}
-                        className={`square ${(r + c) % 2 === 1 ? "black" : "white"}`}
+                        className={`w-12 h-12 relative flex flex-center items-center justify-center cursor-pointer ${(r + c) % 2 === 1 ? "bg-[#769656]" : "bg-[#eeeed2]"}`}
                         onClick={() => { handleSquareClick(r, c); }}
                     >
-                        {square != state.EMPTY && <div className={`piece ${square === state.BLACK ? "black" : "white"}`} />}
+                        {square != state.EMPTY && <div className={`w-10 h-10 rounded-[50vw] ${square === state.BLACK ? "bg-black  border-1 border-solid border-white" : "bg-white border-1 border-solid border-black"}`} />}
                     </div>
                 ))).flat()}
             </div>

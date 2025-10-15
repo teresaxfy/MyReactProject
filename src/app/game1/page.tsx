@@ -1,5 +1,5 @@
 import React from "react";
-import Board2 from "./components/Board2";
+import Board2 from "./components/Board";
 
 export default function BlackWhiteGame() {
     return (
