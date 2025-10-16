@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Card from "./components/Card";
+import { Card, CardAnswer } from "./components/Card";
 
 export default function SwitchCard() {
     const orders = [...Array(10).keys()];
@@ -12,6 +12,9 @@ export default function SwitchCard() {
     const [currentState, setCurrentState] = useState("preGame"); // "preGame", "inGame", "postGame"
     const [seconds, setSeconds] = useState(0);
     const interval = useRef<ReturnType<typeof setInterval> | null>(null);
+    const [hintState, setHintState] = useState(false);
+    const [hintCount, setHintCount] = useState(0);
+    const [prevExchange, setPrevExchange] = useState({ first: -1, second: -1 });
 
     useEffect(() => {
         if (currentState === "inGame") {
@@ -46,6 +49,7 @@ export default function SwitchCard() {
 
         console.log("Exchanging ", { selectionFirst }, " with ", { i });
         exchangeCard(selectionFirst, i);
+        setPrevExchange({ first: selectionFirst, second: i });
         setSelectionFirst(null);
     }
 
@@ -98,48 +102,107 @@ export default function SwitchCard() {
             case "inGame":
                 return (
                     <p>
-                        Way to go! You did
-                        {" "}
-                        {count.toString()}
-                        {" "}
-                        exchanges. There are
+                        Way to go!
                         {" "}
                         {getPairs().toString()}
                         {" "}
-                        same pairs.
+                        out of 10 pictures are in correct position.
                     </p>
                 );
             case "postGame":
-                return (<p>Congratulations, YOU WIN!</p>);
+                return (
+                    <p>Congratulations, YOU WIN!</p>
+                );
             default:
                 return;
         }
     }
 
+    function showHideHint() {
+        const hintOrNot = !hintState;
+        setHintState(hintOrNot);
+        setTimeout(() => {
+            setHintState(!hintOrNot);
+        }, 5000);
+        setHintCount(hintCount + 1);
+    }
+
+    function revertExchange() {
+        if (prevExchange.first === -1) {
+            return;
+        }
+
+        exchangeCard(prevExchange.first, prevExchange.second);
+    }
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen text-base md:text-lg lg:text-xl">
-            <div className="*:block">
-                <button onClick={shuffleCard}>
-                    {currentState === "preGame" ? "Start Game" : "ReStart game"}
-                </button>
+        <>
+            <div className="flex h-20 flex-row items-start">
+                <div className="flex w-20">
+                    {currentState != "preGame"
+                        && (
+                            <p>
+                                {("0" + Math.floor(seconds / 3600).toString()).slice(-2)}
+                                :
+                                {("0" + Math.floor(seconds / 60).toString()).slice(-2)}
+                                :
+                                {("0" + (seconds % 60).toString()).slice(-2)}
+                            </p>
+                        )}
+                </div>
+                <div className="flex items-center w-200">
+                    { currentState != "preGame" && (
+                        <>
+                            <p>
+                                {" "}
+                                You did
+                                {" "}
+                                {count.toString()}
+                                {" "}
+                                exchanges.
+                            </p>
+                            <p>
+                                {" "}
+                                You used
+                                {" "}
+                                {hintCount.toString()}
+                                {" "}
+                                hints.
+                            </p>
+                        </>
+                    ) }
+                </div>
+                <div>
+                    <button className="w-30 border-2 rounded-4xl hover:bg-blue-500" onClick={shuffleCard}>{currentState === "preGame" ? "Start Game" : "Restart"}</button>
+                </div>
+                <div className="flex w-70">
+                    <p></p>
+                </div>
+                <div>
+                    { currentState === "inGame" && <button className="w-30 border-2 rounded-4xl hover:bg-blue-500" onClick={revertExchange}>Revert</button>}
+                </div>
+                <div className="flex w-70">
+                    <p></p>
+                </div>
+                <div>
+                    { currentState === "inGame" && !hintState && <button className="w-30 border-2 rounded-4xl hover:bg-blue-500" onClick={showHideHint}>Show Answer</button>}
+                </div>
             </div>
-            <div className="flex">
-                {
-                    cards.map((i, index) => <Card key={i} id={i} onClick={() => { handleClick(index); }} selected={index === selectionFirst}></Card>)
-                }
+            <div className="flex flex-col items-center justify-baseline min-h-screen text-base md:text-lg lg:text-xl">
+                <div className="flex">
+                    {
+                        cards.map((i, index) => <Card key={i} id={i} onClick={() => { handleClick(index); }} selected={index === selectionFirst}></Card>)
+                    }
+                </div>
+                <div className="flex">
+                    {
+                        hintState && targetCards.map(i => <CardAnswer key={i} id={i}></CardAnswer>)
+                    }
+                </div>
+                <div>
+                    {generateComments()}
+                </div>
             </div>
-            <div>
-                {generateComments()}
-            </div>
-            <div>
-                <p>
-                    {("0" + Math.floor(seconds / 3600).toString()).slice(-2)}
-                    :
-                    {("0" + Math.floor(seconds / 60).toString()).slice(-2)}
-                    :
-                    {("0" + (seconds % 60).toString()).slice(-2)}
-                </p>
-            </div>
-        </div>
+        </>
     );
 }
