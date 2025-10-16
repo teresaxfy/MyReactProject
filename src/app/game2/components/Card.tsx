@@ -38,7 +38,7 @@ const names = [
     "Best Of Luck", // labubu9
 ];
 
-export function CardAnswer({ id }: Readonly<{ id: number;}>): JSX.Element {
+export function CardAnswer({ id }: Readonly<{ id: number }>): JSX.Element {
     return (
         <div>
             <Image
