@@ -34,9 +34,7 @@ export default function RootLayout({
                     |
                     <Link href="/game1">BlackWhiteGame</Link>
                     |
-                    <Link href="/game2">SwitchCard</Link>
-                    |
-                    <Link href="/game3">SwitchBottle</Link>
+                    <Link href="/game2">SwapCard</Link>
                 </nav>
                 {children}
             </body>
