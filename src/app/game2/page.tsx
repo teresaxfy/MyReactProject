@@ -134,7 +134,7 @@ export default function SwapCard() {
         shuffleCard();
         setHintState(false);
         setInstructionState(false);
-        setRemarks("Cards are shuffled and in an incorrect order. Can you swap them to the correct order? Have fun!");
+        setRemarks("Cards are shuffled and in an incorrect order. Can you swap them to the correct order?");
     }
 
     function getPairs(currentArray: number[]) {
