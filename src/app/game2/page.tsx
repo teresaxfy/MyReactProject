@@ -29,7 +29,6 @@ export default function SwapCard() {
     const [gameStatus, setGameStatus] = useState(GameState.PRE_GAME);
 
     const [hintState, setHintState] = useState(true);
-    const [instructionState, setInstructionState] = useState(false);
     const [myPicType, setMyPicType] = useState(PicType.Pic_LABUBU);
 
     const [playGoodJobSound] = useSound("./sounds/goodJob.wav");
@@ -82,7 +81,6 @@ export default function SwapCard() {
         }
         setRemarks(`${pairs.toString()} pairs.`);
         setTargetCards(targetArray);
-        showHideHint();
         setGameStatus(GameState.IN_GAME);
     }
 
@@ -91,10 +89,6 @@ export default function SwapCard() {
         [currentArray[a], currentArray[b]] = [currentArray[b], currentArray[a]];
         setCards([...cards, currentArray]);
         getPairs(currentArray);
-    }
-
-    function showHideHint() {
-        setHintState(!hintState);
     }
 
     function startNewGame() {
@@ -110,7 +104,6 @@ export default function SwapCard() {
         setGameStatus(GameState.PRE_GAME);
         shuffleCard();
         setHintState(false);
-        setInstructionState(false);
         gameStart.current = Date();
         // setRemarks("Ready to play.");
     }
