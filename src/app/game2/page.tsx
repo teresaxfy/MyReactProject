@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import useSound from "use-sound";
-import Instructions from "./components/Instructions";
 import Image from "next/image";
 import labubuS from "./components/labubuIcon.png";
 import Clock from "./components/Clock";
@@ -96,10 +95,6 @@ export default function SwapCard() {
 
     function showHideHint() {
         setHintState(!hintState);
-    }
-
-    function showHideInstructions() {
-        setInstructionState(!instructionState);
     }
 
     function startNewGame() {
@@ -211,18 +206,6 @@ export default function SwapCard() {
                     />
                 </div>
                 <div className="flex h-10">
-                </div>
-                <div>
-                    <button
-                        className="w-100 hover:bg-gray-400"
-                        onClick={showHideInstructions}
-                    >
-                        {instructionState ? "Hide instructions" : "Show instructions"}
-                    </button>
-                </div>
-                <div>
-                    {instructionState
-                        && <Instructions></Instructions>}
                 </div>
             </div>
         </>
