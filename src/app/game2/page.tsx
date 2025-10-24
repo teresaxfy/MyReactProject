@@ -164,15 +164,6 @@ export default function SwapCard() {
     return (
         <>
             <div className="flex flex-col items-center justify-baseline min-h-screen text-base md:text-lg lg:text-xl">
-                <div className="flex">
-                    { gameStatus != GameState.PRE_GAME
-                        && cards[cards.length - 1].map((i, index) => <Card key={i} id={i} onClick={() => { handleClick(index); }} size={size.current} selected={index === selectionFirst} picType={myPicType}></Card>)}
-                </div>
-                <div className="flex">
-                    {
-                        hintState && targetCards.map(i => <Card key={i} onClick={() => { ; }} selected={false} size={size.current} id={i} picType={myPicType}></Card>)
-                    }
-                </div>
                 <Box
                     cards={cards[cards.length - 1]}
                     targetCards={targetCards}

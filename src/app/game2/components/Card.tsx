@@ -47,29 +47,30 @@ export default function Card({
     id,
     onClick,
     selected,
+    size,
     picType,
 }: Readonly<{
     key: number;
     id: number;
     onClick: () => void;
     selected: boolean;
+    size: number;
     picType: PicType;
 }>): JSX.Element {
     switch (picType) {
         case PicType.Pic_LABUBU:
             return (
-            /* */
+            /* <span className="flex justify-center border-2 bg-indigo-400 text-amber-100 lg:text-[1rem] text-[1vm]">
+                        {picCollection[id].name}
+                    </span> */
                 <div>
                     <Image
                         draggable="false"
                         src={picCollection[id].image}
-                        className={` border-2 rounded-md h-[10vw] w-[10vw] ${selected ? "border-red-500 border-4" : "hover:border-purple-500 hover:border-4"}`}
+                        className={` border-2 rounded-md h-[${Math.floor(100 / size).toString()}vw] w-[${Math.floor(100 / size).toString()}vw] ${selected ? "border-red-500 border-4" : "hover:border-purple-500 hover:border-4"}`}
                         alt="labubu"
                         onClick={onClick}
                     />
-                    <span className="flex justify-center border-2 bg-indigo-400 text-amber-100 lg:text-[1rem] text-[clamp(1rem,1vw,3rem)]">
-                        {picCollection[id].name}
-                    </span>
                 </div>
             );
         case PicType.NoPic_COLORS:
