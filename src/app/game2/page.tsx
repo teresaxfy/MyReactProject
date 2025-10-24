@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Card from "./components/Card";
 import useSound from "use-sound";
 import Instructions from "./components/Instructions";
 import Image from "next/image";
@@ -21,8 +20,9 @@ enum PicType {
 }
 
 export default function SwapCard() {
-    const size = useRef(5);
-    const orders = [...Array(size.current).keys()];
+    const [size, setSize] = useState(5);
+    const [level, setLevel] = useState(0);
+    const orders = [...Array(size).keys()];
     const [cards, setCards] = useState([orders]);
     const [targetCards, setTargetCards] = useState(orders);
 
@@ -73,11 +73,11 @@ export default function SwapCard() {
     }
 
     function shuffleCard() {
-        const currentArray = shuffleArray([...Array(size.current).keys()]);
+        const currentArray = shuffleArray([...Array(size).keys()]);
         setCards([currentArray]);
-        const targetArray = shuffleArray([...Array(size.current).keys()]);
+        const targetArray = shuffleArray([...Array(size).keys()]);
         let pairs = 0;
-        for (let i = 0; i < size.current; i++) {
+        for (let i = 0; i < size; i++) {
             if (currentArray[i] == targetArray[i])
                 pairs++;
         }
@@ -114,7 +114,7 @@ export default function SwapCard() {
 
         setGameStatus(GameState.PRE_GAME);
         shuffleCard();
-        setHintState(true);
+        setHintState(false);
         setInstructionState(false);
         gameStart.current = Date();
         // setRemarks("Ready to play.");
@@ -122,7 +122,7 @@ export default function SwapCard() {
 
     function getPairs(currentArray: number[]) {
         let pairs = 0;
-        for (let i = 0; i < size.current; i++) {
+        for (let i = 0; i < size; i++) {
             if (currentArray[i] == targetCards[i])
                 pairs++;
         }
@@ -130,17 +130,24 @@ export default function SwapCard() {
         let previousPairs = 0;
         if (gameStatus === GameState.IN_GAME && cards.length > 0) {
             previousPairs = 0;
-            for (let i = 0; i < size.current; i++) {
+            for (let i = 0; i < size; i++) {
                 if (cards[cards.length - 1][i] == targetCards[i])
                     previousPairs++;
             }
 
             if (pairs > previousPairs) {
-                if (pairs === size.current) {
+                if (pairs === size) {
                     setGameStatus(GameState.POST_GAME);
                     playGameWinSound();
                     setHintState(true);
-                    setRemarks("You win!");
+                    if (size === 10) {
+                        setRemarks("Congratulations! Mission complete!");
+                    }
+                    else {
+                        setLevel(level + 1);
+                        setSize(size + 1);
+                        setRemarks(`You win! You are now on Level ${(level + 1).toString()}`);
+                    }
                 }
                 else {
                     playGoodJobSound();
@@ -168,9 +175,9 @@ export default function SwapCard() {
                     cards={cards[cards.length - 1]}
                     targetCards={targetCards}
                     showCard={gameStatus != GameState.PRE_GAME}
-                    showTargetCard={hintState}
+                    showTargetCard={hintState || level < 2 || gameStatus == GameState.POST_GAME}
                     onClick={handleClick}
-                    size={size.current}
+                    size={size}
                     selectionFirst={selectionFirst}
                     picType={myPicType}
                 >
@@ -185,7 +192,7 @@ export default function SwapCard() {
                 </div>
                 <div className="flex h-20">
                     <div>
-                        <button className="w-50 hover:bg-gray-500" onClick={startNewGame}>{gameStatus === GameState.PRE_GAME ? "Start Game" : "Start Over"}</button>
+                        <button className="w-50 hover:bg-gray-500" onClick={startNewGame}>{gameStatus === GameState.IN_GAME ? `Reshuffle [Level ${level.toString()}]` : `Start Level ${level.toString()}`}</button>
                     </div>
                 </div>
                 <div className="flex h-20">
@@ -205,7 +212,6 @@ export default function SwapCard() {
                 </div>
                 <div className="flex h-10">
                 </div>
-
                 <div>
                     <button
                         className="w-100 hover:bg-gray-400"

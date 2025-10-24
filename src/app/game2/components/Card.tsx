@@ -67,7 +67,7 @@ export default function Card({
                     <Image
                         draggable="false"
                         src={picCollection[id].image}
-                        className={` border-2 rounded-md h-[${Math.floor(100 / size).toString()}vw] w-[${Math.floor(100 / size).toString()}vw] ${selected ? "border-red-500 border-4" : "hover:border-purple-500 hover:border-4"}`}
+                        className={` border-2 rounded-md h-[${Math.floor(80 / size).toString()}vw] w-[${Math.floor(80 / size).toString()}vw] ${selected ? "border-red-500 border-4" : "hover:border-purple-500 hover:border-4"}`}
                         alt="labubu"
                         onClick={onClick}
                     />
