@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Card from "./components/Card";
 import useSound from "use-sound";
 import Instructions from "./components/Instructions";
 import Image from "next/image";
 import labubuS from "./components/labubuIcon.png";
+import Clock from "./components/Clock";
+import Box from "./components/Box";
 
 enum GameState {
     PRE_GAME,
@@ -19,41 +21,24 @@ enum PicType {
 }
 
 export default function SwapCard() {
-    const orders = [...Array(10).keys()];
+    const size = useRef(5);
+    const orders = [...Array(size.current).keys()];
     const [cards, setCards] = useState([orders]);
     const [targetCards, setTargetCards] = useState(orders);
 
     const [selectionFirst, setSelectionFirst] = useState<number | null>(null);
     const [gameStatus, setGameStatus] = useState(GameState.PRE_GAME);
 
-    const [hintState, setHintState] = useState(false);
+    const [hintState, setHintState] = useState(true);
     const [instructionState, setInstructionState] = useState(false);
-    const [revertState, setRevertState] = useState(false);
     const [myPicType, setMyPicType] = useState(PicType.Pic_LABUBU);
 
     const [playGoodJobSound] = useSound("./sounds/goodJob.wav");
     const [playGameWinSound] = useSound("./sounds/gameWin.mp3");
     const [playWrongSound] = useSound("./sounds/wrong-choice.wav");
 
-    const [seconds, setSeconds] = useState(0);
     const [remarks, setRemarks] = useState("Please click the start button to start the card swap game.");
-    const interval = useRef<ReturnType<typeof setInterval> | null>(null);
-
-    useEffect(() => {
-        if (gameStatus === GameState.IN_GAME) {
-            interval.current = setInterval(() => {
-                setSeconds(prevSeconds => prevSeconds + 1);
-            }, 1000); // Update every second (1000ms)
-        }
-        else if (interval.current !== null) {
-            clearInterval(interval.current);
-        }
-        return () => {
-            if (interval.current !== null) {
-                clearInterval(interval.current);
-            }
-        }; // Cleanup on component unmount or isActive change
-    }, [gameStatus]); // Re-run effect when isActive or seconds change
+    const gameStart = useRef<string | null>(null);
 
     function handleClick(i: number) {
         if (gameStatus != GameState.IN_GAME) {
@@ -88,9 +73,16 @@ export default function SwapCard() {
     }
 
     function shuffleCard() {
-        setSeconds(0);
-        setCards([shuffleArray([...Array(10).keys()])]);
-        setTargetCards(shuffleArray([...Array(10).keys()]));
+        const currentArray = shuffleArray([...Array(size.current).keys()]);
+        setCards([currentArray]);
+        const targetArray = shuffleArray([...Array(size.current).keys()]);
+        let pairs = 0;
+        for (let i = 0; i < size.current; i++) {
+            if (currentArray[i] == targetArray[i])
+                pairs++;
+        }
+        setRemarks(`${pairs.toString()} pairs.`);
+        setTargetCards(targetArray);
         showHideHint();
         setGameStatus(GameState.IN_GAME);
     }
@@ -100,7 +92,6 @@ export default function SwapCard() {
         [currentArray[a], currentArray[b]] = [currentArray[b], currentArray[a]];
         setCards([...cards, currentArray]);
         getPairs(currentArray);
-        setRevertState(true);
     }
 
     function showHideHint() {
@@ -109,15 +100,6 @@ export default function SwapCard() {
 
     function showHideInstructions() {
         setInstructionState(!instructionState);
-    }
-
-    function revertExchange() {
-        if (!revertState) return;
-        if (cards.length == 1) return;
-
-        setCards(cards.slice(0, cards.length - 1));
-        setRemarks("Oh, you did a revert.");
-        setRevertState(false);
     }
 
     function startNewGame() {
@@ -132,14 +114,15 @@ export default function SwapCard() {
 
         setGameStatus(GameState.PRE_GAME);
         shuffleCard();
-        setHintState(false);
+        setHintState(true);
         setInstructionState(false);
-        setRemarks("Cards are shuffled and in an incorrect order. Can you swap them to the correct order?");
+        gameStart.current = Date();
+        // setRemarks("Ready to play.");
     }
 
     function getPairs(currentArray: number[]) {
         let pairs = 0;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < size.current; i++) {
             if (currentArray[i] == targetCards[i])
                 pairs++;
         }
@@ -147,13 +130,13 @@ export default function SwapCard() {
         let previousPairs = 0;
         if (gameStatus === GameState.IN_GAME && cards.length > 0) {
             previousPairs = 0;
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < size.current; i++) {
                 if (cards[cards.length - 1][i] == targetCards[i])
                     previousPairs++;
             }
 
             if (pairs > previousPairs) {
-                if (pairs === 10) {
+                if (pairs === size.current) {
                     setGameStatus(GameState.POST_GAME);
                     playGameWinSound();
                     setHintState(true);
@@ -180,45 +163,38 @@ export default function SwapCard() {
 
     return (
         <>
-            <div className="flex h-20 flex-row items-start">
-                <div className="flex w-20">
-                    {gameStatus != GameState.PRE_GAME
-                        && (
-                            <p>
-                                {("0" + Math.floor(seconds / 3600).toString()).slice(-2)}
-                                :
-                                {("0" + Math.floor(seconds / 60).toString()).slice(-2)}
-                                :
-                                {("0" + (seconds % 60).toString()).slice(-2)}
-                            </p>
-                        )}
-                </div>
-            </div>
             <div className="flex flex-col items-center justify-baseline min-h-screen text-base md:text-lg lg:text-xl">
                 <div className="flex">
                     { gameStatus != GameState.PRE_GAME
-                        && cards[cards.length - 1].map((i, index) => <Card key={i} id={i} onClick={() => { handleClick(index); }} selected={index === selectionFirst} picType={myPicType}></Card>)}
+                        && cards[cards.length - 1].map((i, index) => <Card key={i} id={i} onClick={() => { handleClick(index); }} size={size.current} selected={index === selectionFirst} picType={myPicType}></Card>)}
                 </div>
                 <div className="flex">
                     {
-                        hintState && targetCards.map(i => <Card key={i} onClick={() => { ; }} selected={false} id={i} picType={myPicType}></Card>)
+                        hintState && targetCards.map(i => <Card key={i} onClick={() => { ; }} selected={false} size={size.current} id={i} picType={myPicType}></Card>)
                     }
                 </div>
-                <div className="flex h-20">
-                    <p></p>
+                <Box
+                    cards={cards[cards.length - 1]}
+                    targetCards={targetCards}
+                    showCard={gameStatus != GameState.PRE_GAME}
+                    showTargetCard={hintState}
+                    onClick={handleClick}
+                    size={size.current}
+                    selectionFirst={selectionFirst}
+                    picType={myPicType}
+                >
+                </Box>
+                <div className="flex h-10">
+                    <Clock show={gameStatus != GameState.PRE_GAME} isOn={gameStatus == GameState.IN_GAME} startTime={gameStart.current}></Clock>
                 </div>
-                <div className="flex h-20 text-4xl text-black">
+                <div className="flex h-20 text-2xl text-black">
                     <div>
                         {remarks}
                     </div>
                 </div>
                 <div className="flex h-20">
                     <div>
-                        <button className="w-50 hover:bg-gray-400" onClick={startNewGame}>{gameStatus === GameState.PRE_GAME ? "Start Game" : "Start a new game"}</button>
-                    </div>
-                    <div className="flex w-30"></div>
-                    <div>
-                        { revertState && gameStatus === GameState.IN_GAME && <button className="w-50 hover:bg-gray-400" onClick={revertExchange}>Revert Previous Step</button>}
+                        <button className="w-50 hover:bg-gray-500" onClick={startNewGame}>{gameStatus === GameState.PRE_GAME ? "Start Game" : "Start Over"}</button>
                     </div>
                 </div>
                 <div className="flex h-20">
