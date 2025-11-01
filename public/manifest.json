@@ -3,12 +3,12 @@
   "name": "WatermelonPWA",
   "icons": [
     {
-      "src": "src/a-lb-192x192.png",
+      "src": "%PUBLIC_URL%/images/a-lb-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "src/a-lb-512x512.png",
+      "src": "%PUBLIC_URL%/images/a-lb-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
